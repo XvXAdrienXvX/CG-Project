@@ -65,9 +65,6 @@ class Terrain {
       v[2] = this.vBuffer[vid + 2];
     }
   
-    /**
-    * Send the buffer objects to WebGL for rendering 
-    */
     loadBuffers() {
       // Specify the vertex coordinates
       this.VertexPositionBuffer = gl.createBuffer();

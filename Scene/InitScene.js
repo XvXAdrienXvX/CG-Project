@@ -65,6 +65,9 @@ var kEdgeBlack = [0.0, 0.0, 0.0];
 /** @global Edge color for wireframe rendering */
 var kEdgeWhite = [1.0, 1.0, 1.0];
 
+var vertexShaderSource, fragmentShaderSource;
+
+var initShader = new InitShader();
 // -------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
@@ -175,86 +178,13 @@ function createGLContext(canvas) {
 
 //----------------------------------------------------------------------------------
 /**
- * Loads Shaders
- * @param {string} id ID string for shader to load. Either vertex shader/fragment shader
- */
-function loadShaderFromDOM(id) {
-  var shaderScript = document.getElementById(id);
-
-  // If we don't find an element with the specified id
-  // we do an early exit 
-  if (!shaderScript) {
-    return null;
-  }
-
-  // Loop through the children for the found DOM element and
-  // build up the shader source code as a string
-  var shaderSource = "";
-  var currentChild = shaderScript.firstChild;
-  while (currentChild) {
-    if (currentChild.nodeType == 3) { // 3 corresponds to TEXT_NODE
-      shaderSource += currentChild.textContent;
-    }
-    currentChild = currentChild.nextSibling;
-  }
-
-  var shader;
-  if (shaderScript.type == "x-shader/x-fragment") {
-    shader = gl.createShader(gl.FRAGMENT_SHADER);
-  } else if (shaderScript.type == "x-shader/x-vertex") {
-    shader = gl.createShader(gl.VERTEX_SHADER);
-  } else {
-    return null;
-  }
-
-  gl.shaderSource(shader, shaderSource);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    alert(gl.getShaderInfoLog(shader));
-    return null;
-  }
-  return shader;
-}
-
-//----------------------------------------------------------------------------------
-/**
  * Setup the fragment and vertex shaders
  */
-function setupShaders() {
-  vertexShader = loadShaderFromDOM("shader-vs");
-  fragmentShader = loadShaderFromDOM("shader-fs");
+loadShaders = () => {
+  vertexShaderSource = document.getElementById("shader-vs");
+  fragmentShaderSource = document.getElementById("shader-fs");
 
-  shaderProgram = gl.createProgram();
-  gl.attachShader(shaderProgram, vertexShader);
-  gl.attachShader(shaderProgram, fragmentShader);
-  gl.linkProgram(shaderProgram);
-
-  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    alert("Failed to setup shaders");
-  }
-
-  gl.useProgram(shaderProgram);
-
-  shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-  gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-  shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
-  gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
-
-  shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-  shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-  shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
-  shaderProgram.uniformLightPositionLoc = gl.getUniformLocation(shaderProgram, "uLightPosition");
-  shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");
-  shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
-  shaderProgram.uniformSpecularLightColorLoc = gl.getUniformLocation(shaderProgram, "uSpecularLightColor");
-  shaderProgram.uniformShininessLoc = gl.getUniformLocation(shaderProgram, "uShininess");
-  shaderProgram.uniformAmbientMaterialColorLoc = gl.getUniformLocation(shaderProgram, "uKAmbient");
-  shaderProgram.uniformDiffuseMaterialColorLoc = gl.getUniformLocation(shaderProgram, "uKDiffuse");
-  shaderProgram.uniformSpecularMaterialColorLoc = gl.getUniformLocation(shaderProgram, "uKSpecular");
-  shaderProgram.uniformMaxZLoc = gl.getUniformLocation(shaderProgram, "maxZ");
-  shaderProgram.uniformMinZLoc = gl.getUniformLocation(shaderProgram, "minZ");
+ 
 }
 
 //-------------------------------------------------------------------------
@@ -295,14 +225,6 @@ function setLightUniforms(loc, a, d, s) {
 function setZUniforms(maxZ, minZ) {
   gl.uniform1f(shaderProgram.uniformMaxZLoc, maxZ);
   gl.uniform1f(shaderProgram.uniformMinZLoc, minZ);
-}
-//----------------------------------------------------------------------------------
-/**
- * Populate buffers with data
- */
-function setupBuffers() {
-  myTerrain = new Terrain(100, -0.5, 0.5, -0.5, 0.5);
-  myTerrain.loadBuffers();
 }
 
 /**
@@ -360,8 +282,8 @@ function animate() {
 /**
  * Tick called for every animation frame.
  */
-function tick() {
-  requestAnimationFrame(tick);
+function render() {
+  requestAnimationFrame(render);
   setViewportSize(gl, canvas);
   animate();
   draw();
@@ -373,12 +295,14 @@ function tick() {
 function main() {
   canvas = document.getElementById("glCanvas");
   gl = createGLContext(canvas);
-
+  shaderProgram = gl.createProgram();
   gl.clearColor(0.0, 0.0, 0.0, 0.8);
   gl.enable(gl.DEPTH_TEST);
+  initShader.createVertexShader();
+  initShader.createFragmentShader();
+  initShader.createShaderProgram();
+  myTerrain = new Terrain(100, -0.5, 0.5, -0.5, 0.5);
+  myTerrain.loadBuffers();
 
-  setupShaders();
-  setupBuffers();
-
-  tick();
+  render();
 }
