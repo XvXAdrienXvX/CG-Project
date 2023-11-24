@@ -44,7 +44,6 @@ class Terrain {
     * @param {number} j the jth column of vertices
     */
     setVertex(v, i, j) {
-      //Your code here
       var vid = (i * (this.div + 1) + j) * 3;
       this.vBuffer[vid] = v[0];
       this.vBuffer[vid + 1] = v[1];
@@ -58,7 +57,6 @@ class Terrain {
     * @param {number} j the jth column of vertices
     */
     getVertex(v, i, j) {
-      //Your code here
       var vid = (i * (this.div + 1) + j) * 3;
       v[0] = this.vBuffer[vid];
       v[1] = this.vBuffer[vid + 1];
@@ -200,18 +198,17 @@ class Terrain {
      * Generate the plane by randomly devide the vertices
      */
     updateVertices() {
-      // Number of iterations
-      var it = 200;
+      var iterations = 200;
       // Adjustment of each iteration
       var delta = 0.0035;
   
-      for (var i = 0; i < it; i++) {
-        var p = [Math.random() * (this.maxX - this.minX) + this.minX, Math.random() * (this.maxY - this.minY) + this.minY];
+      for (var i = 0; i < iterations; i++) {
+        var point = [Math.random() * (this.maxX - this.minX) + this.minX, Math.random() * (this.maxY - this.minY) + this.minY];
         var n = glMatrix.vec2.create();
         glMatrix.vec2.random(n);
         for (var j = 0; j < this.numVertices; j++) {
           var b = [this.vBuffer[j * 3], this.vBuffer[j * 3 + 1]];
-          if ((b[0] - p[0]) * n[0] + (b[1] - p[1]) * n[1] > 0) {
+          if ((b[0] - point[0]) * n[0] + (b[1] - point[1]) * n[1] > 0) {
             this.vBuffer[j * 3 + 2] += delta;
           } else {
             this.vBuffer[j * 3 + 2] -= delta;
