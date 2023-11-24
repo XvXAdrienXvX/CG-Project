@@ -88,3 +88,19 @@ gl_FragColor = vec4(((uAmbientLightColor*uKAmbient)
 
 }
 `;
+
+const attributeMapper = {
+  "mvMatrixUniform": "uMVMatrix",
+  "pMatrixUniform": "uPMatrix",
+  "nMatrixUniform": "uNMatrix",
+  "uniformLightPositionLoc": "uLightPosition",
+  "uniformAmbientLightColorLoc": "uAmbientLightColor",
+  "uniformDiffuseLightColorLoc": "uDiffuseLightColor",
+  "uniformSpecularLightColorLoc": "uSpecularLightColor",
+  "uniformShininessLoc": "uShininess",
+  "uniformAmbientMaterialColorLoc": "uKAmbient",
+  "uniformDiffuseMaterialColorLoc": "uKDiffuse",
+  "uniformSpecularMaterialColorLoc": "uKSpecular",
+  "uniformMaxZLoc": "maxZ",
+  "uniformMinZLoc": "minZ"
+};

@@ -68,21 +68,13 @@ var kEdgeWhite = [1.0, 1.0, 1.0];
 var vertexShaderSource, fragmentShaderSource;
 
 var initShader = new InitShader();
-// -------------------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-/**
- * Sends Modelview matrix to shader
- */
-function uploadModelViewMatrixToShader() {
+function setModelViewMatrixToShader() {
   gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
 }
 
-//-------------------------------------------------------------------------
-/**
- * Sends projection matrix to shader
- */
-function uploadProjectionMatrixToShader() {
+
+function setProjectionMatrixToShader() {
   gl.uniformMatrix4fv(shaderProgram.pMatrixUniform,
     false, pMatrix);
 }
@@ -91,7 +83,7 @@ function uploadProjectionMatrixToShader() {
 /**
  * Generates and sends the normal matrix to the shader
  */
-function uploadNormalMatrixToShader() {
+function setNormalMatrixToShader() {
   glMatrix.mat3.fromMat4(nMatrix, mvMatrix);
   glMatrix.mat3.transpose(nMatrix, nMatrix);
   glMatrix.mat3.invert(nMatrix, nMatrix);
@@ -124,9 +116,9 @@ function mvPopMatrix() {
  * Sends projection/modelview matrices to shader
  */
 function setMatrixUniforms() {
-  uploadModelViewMatrixToShader();
-  uploadNormalMatrixToShader();
-  uploadProjectionMatrixToShader();
+  setModelViewMatrixToShader();
+  setNormalMatrixToShader();
+  setProjectionMatrixToShader();
 }
 
 //----------------------------------------------------------------------------------
@@ -254,21 +246,8 @@ function draw() {
   setMatrixUniforms();
   setLightUniforms(lightPosition, lAmbient, lDiffuse, lSpecular);
   setZUniforms(myTerrain.maxZ, myTerrain.minZ);
-
-  if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked)) {
-    setMaterialUniforms(shininess, kAmbient, kTerrainDiffuse, kSpecular);
-    myTerrain.drawTriangles();
-  }
-
-  if (document.getElementById("wirepoly").checked) {
-    setMaterialUniforms(shininess, kAmbient, kEdgeBlack, kSpecular);
-    myTerrain.drawEdges();
-  }
-
-  if (document.getElementById("wireframe").checked) {
-    setMaterialUniforms(shininess, kAmbient, kEdgeWhite, kSpecular);
-    myTerrain.drawEdges();
-  }
+  setMaterialUniforms(shininess, kAmbient, kTerrainDiffuse, kSpecular);
+  myTerrain.drawTriangles();
   mvPopMatrix();
 }
 
@@ -279,6 +258,10 @@ function animate() {
   viewRot += 0.15;
 }
 
+onGenerate = () => {
+  myTerrain = new Terrain(100, -0.5, 0.5, -0.5, 0.5);
+  myTerrain.loadBuffers();
+}
 /**
  * Tick called for every animation frame.
  */
@@ -301,8 +284,6 @@ function main() {
   initShader.createVertexShader();
   initShader.createFragmentShader();
   initShader.createShaderProgram();
-  myTerrain = new Terrain(100, -0.5, 0.5, -0.5, 0.5);
-  myTerrain.loadBuffers();
-
+  onGenerate();
   render();
 }

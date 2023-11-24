@@ -146,7 +146,6 @@ class Terrain {
      * Fill the vertex and buffer arrays 
      */
     generateTriangles() {
-      //Your code here
       var deltaX = (this.maxX - this.minX) / this.div;
       var deltaY = (this.maxY - this.minY) / this.div;
   
