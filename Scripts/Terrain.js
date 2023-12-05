@@ -1,12 +1,5 @@
 class Terrain {
-    /**
-     * Initialize members of a Terrain object
-     * @param {number} div Number of triangles along x axis and y axis
-     * @param {number} minX Minimum X coordinate value
-     * @param {number} maxX Maximum X coordinate value
-     * @param {number} minY Minimum Y coordinate value
-     * @param {number} maxY Maximum Y coordinate value
-     */
+
     constructor(div, minX, maxX, minY, maxY) {
       this.div = div;
       this.minX = minX;
@@ -14,13 +7,9 @@ class Terrain {
       this.maxX = maxX;
       this.maxY = maxY;
   
-      // Allocate vertex array
       this.vBuffer = [];
-      // Allocate triangle array
       this.fBuffer = [];
-      // Allocate normal array
       this.nBuffer = [];
-      // Allocate array for edges so we can draw wireframe
       this.eBuffer = [];
       console.log("Terrain: Allocated buffers");
   
@@ -30,32 +19,19 @@ class Terrain {
       this.generateLines();
       console.log("Terrain: Generated lines");
   
-      // Get extension for 4 byte integer indices for drwElements
       var ext = gl.getExtension('OES_element_index_uint');
       if (ext == null) {
         alert("OES_element_index_uint is unsupported by your browser and terrain generation cannot proceed.");
       }
     }
   
-    /**
-    * Set the x,y,z coords of a vertex at location(i,j)
-    * @param {Object} v an an array of length 3 holding x,y,z coordinates
-    * @param {number} i the ith row of vertices
-    * @param {number} j the jth column of vertices
-    */
     setVertex(v, i, j) {
       var vid = (i * (this.div + 1) + j) * 3;
       this.vBuffer[vid] = v[0];
       this.vBuffer[vid + 1] = v[1];
       this.vBuffer[vid + 2] = v[2];
     }
-  
-    /**
-    * Return the x,y,z coordinates of a vertex at location (i,j)
-    * @param {Object} v an an array of length 3 holding x,y,z coordinates
-    * @param {number} i the ith row of vertices
-    * @param {number} j the jth column of vertices
-    */
+
     getVertex(v, i, j) {
       var vid = (i * (this.div + 1) + j) * 3;
       v[0] = this.vBuffer[vid];
@@ -193,7 +169,7 @@ class Terrain {
      * Generate the plane by randomly devide the vertices
      */
     updateVertices() {
-      const iterations = 200;
+      const iterations = 400;
       const delta = 0.0035; // height
       const randomPoint = () => [Math.random() * (this.maxX - this.minX) + this.minX, Math.random() * (this.maxY - this.minY) + this.minY];
       const randomDirection = () => glMatrix.vec2.random(glMatrix.vec2.create());
@@ -284,10 +260,6 @@ class Terrain {
     }    
   
 
-    /**
-     * Generates line values from faces in faceArray
-     * to enable wireframe rendering
-     */
     generateLines() {
       var numTris = this.fBuffer.length / 3;
       for (var f = 0; f < numTris; f++) {
